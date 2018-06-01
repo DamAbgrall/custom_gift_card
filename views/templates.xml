@@ -1,0 +1,20 @@
+<odoo>
+    <data>
+        <template id="res_partner_form_add_BC" inherit_id="base.view_partner_form">
+            <xpath expr="//form[1]/sheet[1]/notebook[1]" position="inside">
+                <page name="custom_BC" string="Bon cadeau">
+                    <field name="list_BC" nolabel="1" colspan="4">
+                        <tree string="Bon cadeau" editable="bottom">
+                          <field name="ref_com"/>
+                          <field name="nom"/>
+                          <field name="prix"/>
+                          <field name="date_utilisation"/>
+                          <field name="date_expiration"/>
+                          <field name="statut"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </template>
+    </data>
+</odoo>

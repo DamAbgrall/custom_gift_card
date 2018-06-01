@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+	<record id="bon_cadeau_expiration" model="mail.template">
+	  <field name="name">Expiration bon cadeau</field>
+	  <field name="email_from">${user.email|safe}</field>
+	  <field name="subject">bon cadeau de ${object.user_id.title} ${object.user_id.name} arrive à expiration</field>
+	  <field name="email_to">${user.email|safe}</field>
+	  <field name="lang">${object.lang}</field>
+	  <field name="model_id" ref="model_bon_cadeau"/>
+	  <field name="auto_delete" eval="False"/>
+	  <field name="body_html">
+		<![CDATA[
+		  <p>Le bon cadeau de ${object.user_id.title} ${object.user_id.name} d'un montant de ${object.prix} arrivera à expiration le ${object.date_expiration}.</p>
+		  <p>Email : ${object.user_id.email}</p>
+		  <p>Mobile : ${object.user_id.mobile}</p>
+		  <p>Fix : ${object.user_id.phone}</p>
+		]]>
+	  </field>
+	</record>
+	
+	<record id="sport_product_template_form" model="ir.ui.view">
+		<field name="name">product.template.inherit.sport.form</field>
+		<field name="model">product.template</field>
+		<field name="inherit_id" ref="product.product_template_only_form_view"/>
+		<field name="arch" type="xml">
+			<field name="purchase_ok" position="before">
+				<div>
+					<field name="is_gift_card" />
+					<label for="is_gift_card"/>
+				</div>
+			</field>
+		</field>
+    </record>
+  </data>
+</odoo>
