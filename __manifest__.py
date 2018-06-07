@@ -24,7 +24,7 @@
 
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
+        'views/point_of_sale.xml',
         'views/views.xml',
         'views/templates.xml',
     ],
@@ -32,4 +32,5 @@
     'demo': [
         'demo/demo.xml',
     ],
+	'qweb': ['static/src/xml/pos.xml'],
 }

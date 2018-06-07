@@ -12,22 +12,52 @@ class ProductTemplate(models.Model):
 
     is_gift_card = fields.Boolean(default=False, string="Est un bon cadeau")
 	
+class AccountJournal(models.Model):
+	_inherit = 'account.journal'
+	
+	gift_card = fields.Boolean(default=False, string="Est un moyen de paiment bon cadeau")
+	
+class AccountBankStatementLine(models.Model):
+	_inherit = 'account.bank.statement.line'
+	gift_card_checked = fields.Boolean(default=False, string="Est vérifié")
+	
 class PosOrder(models.Model):
 	_inherit = 'pos.order'
 	
 	def write(self,vals):
 		logging.info("gift_card")
-		if self.partner_id:
-			for bonCadeau in self.partner_id.list_BC:
-				if bonCadeau.ref_com.id == self.id:
-					return super(PosOrder,self).write(vals)
-			for line in self.lines:
-				if line.product_id.product_tmpl_id.is_gift_card == True : 
-					self.env['bon.cadeau'].create({
-						"ref_com":self.id,
-						"user_id":self.partner_id.id,
-						"prix":self.amount_total,
-					})
+		if self.isChecked == False :
+			if self.partner_id:
+				for bonCadeau in self.partner_id.list_BC:
+					if bonCadeau.ref_com.id == self.id:
+						return super(PosOrder,self).write(vals)
+				for line in self.lines:
+					if line.product_id.product_tmpl_id.is_gift_card == True : 
+						self.env['bon.cadeau'].create({
+							"ref_com":self.id,
+							"user_id":self.partner_id.id,
+							"prix":self.amount_total,
+						})
+				if self.partner_id.list_BC:
+					total_amount =0
+					logging.info("debut")
+					for statement in self.statement_ids:
+						logging.info(statement.journal_id.gift_card)
+						if statement.gift_card_checked == False :
+							if statement.journal_id.gift_card:
+								logging.info(statement.amount)
+								total_amount = total_amount + statement.amount
+								statement.gift_card_checked = True
+					logging.info(total_amount)
+					for bon in self.partner_id.list_BC:
+						if bon.statut == "dispo":
+							if bon.amount_left <= total_amount:
+								total_amount = total_amount - bon.amount_left
+								bon.amount_used = bon.prix
+								bon.date_utilisation = date.today()
+							else : 
+								bon.amount_used = bon.amount_used + total_amount
+								total_amount = 0						
 		return super(PosOrder,self).write(vals)
 		
 class BonCadeau(models.Model):
@@ -35,12 +65,19 @@ class BonCadeau(models.Model):
 	
 	ref_com = fields.Many2one('pos.order',String='Référence commande')
 	user_id = fields.Many2one('res.partner',ondelete='cascade',invisible=True)
-	prix=fields.Float(String='Valeur du bon cadeau')
+	prix=fields.Float(String='Valeur total du bon cadeau')
+	amount_used=fields.Float(String='Valeur utilisé du bon cadeau')
+	amount_left=fields.Float(String='Valeur restante du bon cadeau',compute='_compute_amount_left')
 	date_utilisation=fields.Date(string='Date d\'utilisation')
 	date_expiration=fields.Date(string='Date d\'expriation', compute='_compute_date_expiration',store=True)
 	statut=fields.Selection([('dispo', 'Disponible'),('utilise', 'Utilisé'),('expire', 'Expiré')],default='dispo')
 	warning_delta = fields.Float(string='Jours avant l\'alerte', compute='_compute_warning_delta')
 	expiration_delta = fields.Float(string='Jours avant expiration', compute='_compute_expiration_delta')
+	
+	@api.depends('amount_used')
+	def _compute_amount_left(self):
+		for record in self:
+			record.amount_left = record.prix - record.amount_used
 	
 	@api.depends('ref_com')
 	def _compute_date_expiration(self):

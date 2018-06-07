@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+<!-- Extend orderline view in POS screen-->
+
+    <t t-extend="PaymentScreenWidget">
+        <t t-jquery=".js_set_customer" t-operation="append">
+			<p style="line-height:0px" >Solde carte cadeau :<span class="test"></span>€</p>
+		</t>
+    </t>
+</templates>
