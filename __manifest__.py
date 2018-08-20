@@ -2,25 +2,18 @@
 {
     'name': "Custom gift card",
 
-    'summary': """
-        Short (1 phrase/line) summary of the module's purpose, used as
-        subtitle on modules listing or apps.openerp.com""",
+    'summary': """Allow you to sell and use gift cards in the POS module""",
 
-    'description': """
-        Long description of module's purpose
-    """,
+    'description': """This modules allows you to sell or create gift cards for your contacts and use them as a payment method in the POS module """,
 
-    'author': "My Company",
-    'website': "http://www.yourcompany.com",
+	'author': "Noosys",
+    'website': "http://btbc.fr/",
 
-    # Categories can be used to filter modules in modules listing
-    # Check https://github.com/odoo/odoo/blob/master/odoo/addons/base/module/module_data.xml
-    # for the full list
-    'category': 'Uncategorized',
-    'version': '0.1',
+    'category': 'Point Of Sale',
+    'version': '1.0',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'sale','mail','point_of_sale'],
+    'depends': ['base', 'sale','point_of_sale'],
 
     # always loaded
     'data': [
@@ -28,9 +21,6 @@
         'views/views.xml',
         'views/templates.xml',
     ],
-    # only loaded in demonstration mode
-    'demo': [
-        'demo/demo.xml',
-    ],
-	'qweb': ['static/src/xml/pos.xml'],
+	'js': ['static/src/js/config.js'],
+	'qweb': ['static/src/xml/pos.xml']
 }
